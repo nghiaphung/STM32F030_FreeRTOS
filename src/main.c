@@ -4,6 +4,10 @@
 
 #include "stm32f0xx.h"
 
+void vApplicationStackOverflowHook (void)
+{
+
+}
 
 int main(void)
 {

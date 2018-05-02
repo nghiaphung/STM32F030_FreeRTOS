@@ -40,12 +40,12 @@ SRCS    = ./core/stm32f0xx_it.c \
 		./STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c \
 		./STM32F0xx_StdPeriph_Driver/src/stm32f0xx_tim.c \
 		./STM32F0xx_StdPeriph_Driver/src/stm32f0xx_usart.c \
-		./FreeRTOS/portable/GCC/ARM_CM0/port.c \
-		./FreeRTOS/portalbe/MemMang/heap_4.c \
+		./FreeRTOS/portable/MemMang/heap_4.c \
 		./FreeRTOS/tasks.c \
 		./FreeRTOS/list.c \
+		./FreeRTOS/portable/GCC/ARM_CM0/port.c \
 		./FreeRTOS/queue.c \
-		./FreeRTOS/timers.c 
+		./FreeRTOS/timers.c
 
 OBJS = $(SRCS:.c=.o)
 .PHONY : clean all
