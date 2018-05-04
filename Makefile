@@ -14,38 +14,47 @@ CFLAGS = -c -fno-common \
 		-mcpu=cortex-m0 -Wall \
 		-mthumb
 
-LDSCRIPT = ld/stm32_flash.ld
+LDSCRIPT = kernel/ld/stm32_flash.ld
 LDFLAGS	 = --gc-sections,-T$(LDSCRIPT),-no-startup,-nostdlib,-lnosys
 OCFLAGS  = -Obinary
 ODFLAGS  = -S
 OUTPUT_DIR = bin
 TARGET = $(OUTPUT_DIR)/main
 
-INCLUDE = -I./core/include \
-		-I./STM32F0xx_StdPeriph_Driver/inc \
-		-I./FreeRTOS/include \
-		-I./FreeRTOS/portable/GCC/ARM_CM0
+INCLUDE = -I./kernel/hal/CMSIS/Include \
+		-I./kernel/hal \
+		-I./kernel/hal/config \
+		-I./kernel/hal/STM32F0xx_StdPeriph_Driver/inc \
+		-I./kernel/hal/vectors \
+		-I./kernel/FreeRTOS/include \
+		-I./kernel/FreeRTOS/portable/GCC/ARM_CM0 \
+		-I./kernel/FreeRTOS/config \
+		-I./drivers/button \
+		-I./drivers/led \
+		-I./drivers/meter \
+		-I./drivers/serial \
+		-I./drivers/timer
 
-SRCS    = ./core/stm32f0xx_it.c \
-		./core/system_stm32f0xx.c \
-		./src/main.c \
-		./STM32F0xx_StdPeriph_Driver/src/stm32f0xx_adc.c \
-		./STM32F0xx_StdPeriph_Driver/src/stm32f0xx_exti.c \
-		./STM32F0xx_StdPeriph_Driver/src/stm32f0xx_flash.c \
-		./STM32F0xx_StdPeriph_Driver/src/stm32f0xx_gpio.c \
-		./STM32F0xx_StdPeriph_Driver/src/stm32f0xx_i2c.c \
-		./STM32F0xx_StdPeriph_Driver/src/stm32f0xx_misc.c \
-		./STM32F0xx_StdPeriph_Driver/src/stm32f0xx_rcc.c \
-		./STM32F0xx_StdPeriph_Driver/src/stm32f0xx_spi.c \
-		./STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c \
-		./STM32F0xx_StdPeriph_Driver/src/stm32f0xx_tim.c \
-		./STM32F0xx_StdPeriph_Driver/src/stm32f0xx_usart.c \
-		./FreeRTOS/portable/MemMang/heap_4.c \
-		./FreeRTOS/tasks.c \
-		./FreeRTOS/list.c \
-		./FreeRTOS/portable/GCC/ARM_CM0/port.c \
-		./FreeRTOS/queue.c \
-		./FreeRTOS/timers.c
+
+SRCS = ./kernel/hal/system_stm32f0xx.c \
+		./kernel/hal/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_adc.c \
+		./kernel/hal/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_exti.c \
+		./kernel/hal/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_flash.c \
+		./kernel/hal/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_gpio.c \
+		./kernel/hal/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_i2c.c \
+		./kernel/hal/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_misc.c \
+		./kernel/hal/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_rcc.c \
+		./kernel/hal/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_spi.c \
+		./kernel/hal/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c \
+		./kernel/hal/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_tim.c \
+		./kernel/hal/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_usart.c \
+		./kernel/FreeRTOS/portable/MemMang/heap_4.c \
+		./kernel/FreeRTOS/tasks.c \
+		./kernel/FreeRTOS/list.c \
+		./kernel/FreeRTOS/queue.c \
+		./kernel/FreeRTOS/timers.c \
+		./kernel/FreeRTOS/portable/GCC/ARM_CM0/port.c \
+		./main/main.c
 
 OBJS = $(SRCS:.c=.o)
 .PHONY : clean all
@@ -67,8 +76,8 @@ $(TARGET).list: $(TARGET).elf
 $(TARGET).bin: $(TARGET).elf
 	$(OC) $(OCFLAGS) $(TARGET).elf $(TARGET).bin
 
-$(TARGET).elf: $(OBJS) ./core/startup_stm32f030.o
-	@$(CC) -mcpu=cortex-m0 -mthumb -Wl,$(LDFLAGS),-o$(TARGET).elf,-Map,$(TARGET).map ./core/startup_stm32f030.o $(OBJS)
+$(TARGET).elf: $(OBJS) ./kernel/hal/startup_stm32f030.o
+	@$(CC) -mcpu=cortex-m0 -mthumb -Wl,$(LDFLAGS),-o$(TARGET).elf,-Map,$(TARGET).map ./kernel/hal/startup_stm32f030.o $(OBJS)
 
 %.o: %.c
 	@echo "  CC $<"
