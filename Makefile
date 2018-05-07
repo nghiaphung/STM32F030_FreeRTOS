@@ -54,6 +54,10 @@ SRCS = ./kernel/hal/system_stm32f0xx.c \
 		./kernel/FreeRTOS/queue.c \
 		./kernel/FreeRTOS/timers.c \
 		./kernel/FreeRTOS/portable/GCC/ARM_CM0/port.c \
+		./drivers/led/led.c \
+		./drivers/button/button.c \
+		./drivers/meter/meter.c \
+		./drivers/serial/serial.c \
 		./main/main.c
 
 OBJS = $(SRCS:.c=.o)
