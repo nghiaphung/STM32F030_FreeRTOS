@@ -54,7 +54,7 @@ void Serial_Init (void)
 
 	/* Enable GPIOA, USART1 clock */
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 
 	GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_AF;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
@@ -103,7 +103,7 @@ void Serial_SendByte(uint8_t byte)
  * @param[in]   length	: number of data bytes
  * @return      none
  */
-void Serial_Send(uint8_t* data, uint16_t length)
+void Serial_Send(char* data, uint16_t length)
 {
 	//<! Sending data
 	_write(0, (char*)data, length);

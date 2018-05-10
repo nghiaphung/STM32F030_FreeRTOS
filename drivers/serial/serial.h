@@ -7,6 +7,6 @@
 
 void Serial_Init (void);
 void Serial_SendByte(uint8_t byte);
-void Serial_Send(uint8_t* data, uint16_t length);
+void Serial_Send(char* data, uint16_t length);
 
 #endif /* SERIAL_H */

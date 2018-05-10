@@ -68,7 +68,7 @@
 #if !defined (STM32F030) && !defined (STM32F031) && !defined (STM32F051) && \
     !defined (STM32F072) && !defined (STM32F042) && !defined (STM32F091) && \
     !defined (STM32F070xB) && !defined (STM32F070x6) && !defined (STM32F030xC)
-  /* #define STM32F030 */
+  #define STM32F030
   /* #define STM32F031 */
   /* #define STM32F051 */
   /* #define STM32F072 */
@@ -76,7 +76,7 @@
   /* #define STM32F042 */
   /* #define STM32F070x6 */
   /* #define STM32F091 */
-  #define STM32F030xC
+  //#define STM32F030xC
 #endif /* STM32F030 || STM32F031 || STM32F051 || STM32F072 || STM32F042 || STM32F091 ||
           STM32F070xB || STM32F070x6 || STM32F030xC */
 
