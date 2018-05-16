@@ -5,6 +5,7 @@
 #ifndef METER_H
 #define METER_H
 
+void Meter_Init (void);
 
 
 #endif /* METER_H */

@@ -33,7 +33,13 @@ INCLUDE = -I./kernel/hal/CMSIS/Include \
 		-I./drivers/led \
 		-I./drivers/meter \
 		-I./drivers/serial \
-		-I./drivers/timer
+		-I./drivers/timer \
+		-I./drivers/eeprom \
+		-I./drivers/adc \
+		-I./drivers/rtc \
+		-I./drivers/button \
+		-I./drivers/lora \
+		-I./framework \
 
 
 SRCS = ./kernel/hal/system_stm32f0xx.c \
@@ -54,10 +60,17 @@ SRCS = ./kernel/hal/system_stm32f0xx.c \
 		./kernel/FreeRTOS/queue.c \
 		./kernel/FreeRTOS/timers.c \
 		./kernel/FreeRTOS/portable/GCC/ARM_CM0/port.c \
+		./libs/newlib/_syscalls.c \
+		./libs/newlib/assert.c \
+		./libs/newlib/_sbrk.c \
+		./libs/newlib/_exit.c \
 		./drivers/led/led.c \
 		./drivers/button/button.c \
 		./drivers/meter/meter.c \
 		./drivers/serial/serial.c \
+		./drivers/eeprom/eeprom.c \
+		./drivers/timer/timer.c \
+		./framework/events.c \
 		./main/main.c
 
 OBJS = $(SRCS:.c=.o)

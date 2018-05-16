@@ -10,6 +10,7 @@
 #include "stm32f0xx_usart.h"
 #include "stm32f0xx_misc.h"
 #include "serial.h"
+#include "events.h"
 /******************************************************************************/
 /**!                            LOCAL TYPEDEF                                 */
 /******************************************************************************/
@@ -22,6 +23,10 @@
 #define SERIAL_RX_PORT            GPIOA
 #define SERIAL_TX_PIN             GPIO_Pin_9
 #define SERIAL_RX_PIN             GPIO_Pin_10
+#define SERIAL_GPIO_AF_FUNC       GPIO_AF_1
+#define SERIAL_TX_PIN_SRC         GPIO_PinSource9
+#define SERIAL_RX_PIN_SRC         GPIO_PinSource10
+
 #define SERIAL_BAUDRATE           115200
 
 #ifdef __GNUC__
@@ -38,14 +43,20 @@
 /******************************************************************************/
 /**!                          LOCAL VARIABLES                                 */
 /******************************************************************************/
-
+serial_callback_t serial_callback = vSERIAL_EventHandler;
 /******************************************************************************/
 /**!                    LOCAL FUNCTIONS PROTOTYPES                            */
 /******************************************************************************/
 int _write(int file, char* ptr, int len);
+static void _serial_SendByte(uint8_t byte);
 /******************************************************************************/
 /**!                        EXPORTED FUNCTIONS                                */
 /******************************************************************************/
+/*
+ * @brief Initialize Serial driver
+ * @param none
+ * @return none
+ */
 void Serial_Init (void)
 {
 	USART_InitTypeDef USART_InitStruct;
@@ -62,11 +73,11 @@ void Serial_Init (void)
 	GPIO_InitStruct.GPIO_PuPd  = GPIO_PuPd_UP;
 	/* PA9 Tx pin */
 	GPIO_InitStruct.GPIO_Pin = SERIAL_TX_PIN;
-	GPIO_PinAFConfig(SERIAL_TX_PORT, GPIO_PinSource9, GPIO_AF_1);
+	GPIO_PinAFConfig(SERIAL_TX_PORT, SERIAL_TX_PIN_SRC, SERIAL_GPIO_AF_FUNC);
 	GPIO_Init(SERIAL_TX_PORT, &GPIO_InitStruct);
 	/* PA10 Rx pin */
 	GPIO_InitStruct.GPIO_Pin = SERIAL_RX_PIN;
-	GPIO_PinAFConfig(SERIAL_RX_PORT, GPIO_PinSource10, GPIO_AF_1);
+	GPIO_PinAFConfig(SERIAL_RX_PORT, SERIAL_RX_PIN_SRC, SERIAL_GPIO_AF_FUNC);
 	GPIO_Init(SERIAL_RX_PORT, &GPIO_InitStruct);
 
 	/* Initialize USART1*/
@@ -80,6 +91,7 @@ void Serial_Init (void)
 
 	USART_ITConfig(SERIAL_HW, USART_IT_RXNE, ENABLE);
 	USART_ITConfig(SERIAL_HW, USART_IT_ERR, ENABLE);
+	USART_ITConfig(SERIAL_HW, USART_IT_PE, ENABLE);
 
 	USART_Cmd(SERIAL_HW, ENABLE);
 
@@ -90,12 +102,7 @@ void Serial_Init (void)
 	NVIC_Init(&NVIC_InitStruct);
 }
 
-void Serial_SendByte(uint8_t byte)
-{
-    while (SET != USART_GetFlagStatus(SERIAL_HW, USART_FLAG_TXE));
-    USART_SendData(SERIAL_HW, byte);
 
-}
 
 /**
  * @brief Send number of data bytes via serial port
@@ -122,6 +129,16 @@ PUTCHAR_PROTOTYPE
 /******************************************************************************/
 /**!                          LOCAL FUNCTIONS                                 */
 /******************************************************************************/
+/*
+ * @brief Send 1 byte via Serial
+ * @param[in] byte want to be sent
+ */
+static void _serial_SendByte(uint8_t byte)
+{
+    while (SET != USART_GetFlagStatus(SERIAL_HW, USART_FLAG_TXE));
+    USART_SendData(SERIAL_HW, byte);
+}
+
 /**
  * @brief To re-direct printf() function
  * @param[in]   file: one byte data
@@ -133,7 +150,7 @@ int _write(int file, char* ptr, int len)
     file++;
     int i = 0;
     for (i = 0; i < len; i++)
-        Serial_SendByte(ptr[i]);
+    	_serial_SendByte(ptr[i]);
     return 0;
 }
 
@@ -149,5 +166,30 @@ void USART1_IRQHandler(void)
 	{
 		//<! Get data
 		uint8_t byte = (uint8_t)USART_ReceiveData(SERIAL_HW) & 0xFF;
+		serial_callback(SERIAL_ERR_NONE, byte);
 	}
+	//<! Get overrun interrupt flag
+	else if (SET == USART_GetITStatus(SERIAL_HW, USART_IT_ORE))
+	{
+		serial_callback(SERIAL_ERR_OVERRUN, 0);
+		USART_ClearITPendingBit(SERIAL_HW, USART_IT_ORE);
+	}
+	//<! Get framing error interrupt flag
+	else if (SET == USART_GetITStatus(SERIAL_HW, USART_IT_FE))
+	{
+		serial_callback(SERIAL_ERR_FRAME, 0);
+        USART_ClearITPendingBit(SERIAL_HW, USART_IT_FE);
+	}
+	//<! Get Idle line error interrupt flag
+	else if (SET == USART_GetITStatus(SERIAL_HW, USART_IT_IDLE))
+	{
+		serial_callback(SERIAL_ERR_IDLE_LINE, 0);
+        USART_ClearITPendingBit(SERIAL_HW, USART_IT_IDLE);
+	}
+    //<! Get parity error interrupt flag
+    else if (SET == USART_GetITStatus(SERIAL_HW, USART_IT_PE))
+    {
+    	serial_callback(SERIAL_ERR_PARITY, 0);
+        USART_ClearITPendingBit(SERIAL_HW, USART_IT_PE);
+    }
 }

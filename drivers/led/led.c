@@ -10,7 +10,6 @@
 #include "stm32f0xx_tim.h"
 #include "stm32f0xx_rcc.h"
 #include "led.h"
-
 /******************************************************************************/
 /**!                            LOCAL TYPEDEF                                 */
 /******************************************************************************/
@@ -18,12 +17,12 @@
 /******************************************************************************/
 /**!                            LOCAL SYMBOLS                                 */
 /******************************************************************************/
-#define LED_PORT       GPIOB
-#define LED_PIN        GPIO_Pin_4
-#define LED_AF_PIN_SRC GPIO_PinSource4
-#define LED_AF_FUNC    GPIO_AF_1
-#define LED_TIMER      TIM3
-#define LED_FREQ       1000
+#define LED_GPIO_PORT       GPIOB
+#define LED_GPIO_PIN        GPIO_Pin_4
+#define LED_PIN_SRC         GPIO_PinSource4
+#define LED_GPIO_AF_FUNC    GPIO_AF_1
+#define LED_TIMER           TIM3
+#define LED_FREQ            1000
 /******************************************************************************/
 /**!                         EXPORTED VARIABLES                               */
 /******************************************************************************/
@@ -59,13 +58,13 @@ void Led_Init(void)
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
 
 	/* Initialize GPIO */
-	GPIO_InitStruct.GPIO_Pin   = LED_PIN;
+	GPIO_InitStruct.GPIO_Pin   = LED_GPIO_PIN;
 	GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_AF;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStruct.GPIO_PuPd  = GPIO_PuPd_NOPULL;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_Level_3;
-	GPIO_Init(LED_PORT, &GPIO_InitStruct);
-	GPIO_PinAFConfig(LED_PORT, LED_AF_PIN_SRC, LED_AF_FUNC);
+	GPIO_Init(LED_GPIO_PORT, &GPIO_InitStruct);
+	GPIO_PinAFConfig(LED_GPIO_PORT, LED_PIN_SRC, LED_GPIO_AF_FUNC);
 
 	/* Initialize timer base configuration */
 	TIM_BaseInitStruct.TIM_CounterMode       = TIM_CounterMode_Up;
@@ -73,7 +72,7 @@ void Led_Init(void)
 	TIM_BaseInitStruct.TIM_Period            = TIM_Period;
 	TIM_BaseInitStruct.TIM_ClockDivision     = TIM_CKD_DIV1;
 	TIM_BaseInitStruct.TIM_RepetitionCounter = 0;
-	TIM_TimeBaseInit(TIM3, &TIM_BaseInitStruct);
+	TIM_TimeBaseInit(LED_TIMER, &TIM_BaseInitStruct);
 	TIM_Cmd(LED_TIMER, ENABLE);
 }
 
