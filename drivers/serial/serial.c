@@ -5,12 +5,13 @@
 /******************************************************************************/
 /**!                               INCLUDE                                    */
 /******************************************************************************/
+#include <stdbool.h>
+#include <stddef.h>
 #include "stm32f0xx.h"
 #include "stm32f0xx_gpio.h"
 #include "stm32f0xx_usart.h"
 #include "stm32f0xx_misc.h"
 #include "serial.h"
-#include "events.h"
 /******************************************************************************/
 /**!                            LOCAL TYPEDEF                                 */
 /******************************************************************************/
@@ -27,7 +28,6 @@
 #define SERIAL_TX_PIN_SRC         GPIO_PinSource9
 #define SERIAL_RX_PIN_SRC         GPIO_PinSource10
 
-#define SERIAL_BAUDRATE           115200
 
 #ifdef __GNUC__
   /* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
@@ -43,7 +43,7 @@
 /******************************************************************************/
 /**!                          LOCAL VARIABLES                                 */
 /******************************************************************************/
-serial_callback_t serial_callback = vSERIAL_EventHandler;
+serial_callback_t serial_callback = NULL;
 /******************************************************************************/
 /**!                    LOCAL FUNCTIONS PROTOTYPES                            */
 /******************************************************************************/
@@ -57,7 +57,7 @@ static void _serial_SendByte(uint8_t byte);
  * @param none
  * @return none
  */
-void Serial_Init (void)
+void Serial_Init (serial_t* serial)
 {
 	USART_InitTypeDef USART_InitStruct;
 	GPIO_InitTypeDef  GPIO_InitStruct;
@@ -83,7 +83,7 @@ void Serial_Init (void)
 	/* Initialize USART1*/
 	USART_InitStruct.USART_Parity = USART_Parity_No;
 	USART_InitStruct.USART_StopBits = USART_StopBits_1;
-	USART_InitStruct.USART_BaudRate = SERIAL_BAUDRATE;
+	USART_InitStruct.USART_BaudRate = serial->baudrate;
 	USART_InitStruct.USART_WordLength = USART_WordLength_8b;
 	USART_InitStruct.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 	USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
@@ -100,6 +100,7 @@ void Serial_Init (void)
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_InitStruct.NVIC_IRQChannelPriority = 0;
 	NVIC_Init(&NVIC_InitStruct);
+	serial_callback = serial->callback;
 }
 
 

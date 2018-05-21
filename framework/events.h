@@ -6,11 +6,8 @@
 #ifndef EVENTS_H
 #define EVENTS_H
 
-typedef enum
-{
-    BUTTON_RISING_EDGE  = 0x00,
-    BUTTON_FALLING_EDGE = 0x01
-}button_event_t;
+#include "button.h"
+#include "serial.h"
 
 /**
  * @brief button handle
@@ -20,14 +17,6 @@ typedef struct{
     uint8_t count;
     uint8_t level;
 }button_event_status_t;
-
-/**
- * @brief system events
- */
-typedef struct {
-    uint8_t event;
-    uint8_t param[4];
-}sys_events_t;
 
 /**
  * @brief System event ID

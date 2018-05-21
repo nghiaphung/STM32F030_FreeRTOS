@@ -1,22 +1,18 @@
 /*
- * @filename: events.c
+ * @filename: sysctl.c
  * @date: 16/5/2018
  */
 /******************************************************************************/
 /**!                               INCLUDE                                    */
 /******************************************************************************/
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "FreeRTOS.h"
-#include "stm32f0xx.h"
 #include "queue.h"
 #include "task.h"
 #include "events.h"
-#include "sysctl.h"
 /******************************************************************************/
 /**!                            LOCAL TYPEDEF                                 */
 /******************************************************************************/
@@ -24,14 +20,17 @@
 /******************************************************************************/
 /**!                            LOCAL SYMBOLS                                 */
 /******************************************************************************/
-
+#define SERIAL_QUEUE_SIZE      16
 /******************************************************************************/
 /**!                         EXPORTED VARIABLES                               */
 /******************************************************************************/
-extern xQueueHandle xSysEventQueue;
-extern xQueueHandle xSerialQueue;
+xQueueHandle xSysEventQueue = NULL;
+xQueueHandle xSerialQueue = NULL;
 
-extern button_event_status_t button_event;
+button_event_status_t button_event =
+{
+		.status = false
+};
 /******************************************************************************/
 /**!                          LOCAL VARIABLES                                 */
 /******************************************************************************/
@@ -43,30 +42,14 @@ extern button_event_status_t button_event;
 /******************************************************************************/
 /**!                        EXPORTED FUNCTIONS                                */
 /******************************************************************************/
-void vBUTTON_EventHandler(button_event_t event)
+void vSERIAL_CmdService(void *pvParam)
 {
-	/* do nothing, for debouncing */
-	if(button_event.status == true)
-		return;
-	/* Set blocking flag */
-	button_event.status = true;
-	sys_events_t xSysEvent;
-	xSysEvent.event = SYS_EVENT_BUTTON;
-	/* Send to system even queue */
-	xQueueSend(xSysEventQueue,(void*)&xSysEvent, 0);
-	taskYIELD();
+    /* Create serial Queue */
+    xSerialQueue = xQueueCreate(SERIAL_QUEUE_SIZE, sizeof(uint8_t));
+    if (xSerialQueue == NULL) while (1);
+
 }
 
-void vSERIAL_EventHandler(uint8_t error, uint8_t byte)
-{
-    if (error == SERIAL_ERR_NONE)
-    {
-        xQueueSend(xSerialQueue,(void*)&byte,0);
-        /* Yield for higher priority task */
-        taskYIELD();
-    }
-}
 /******************************************************************************/
 /**!                           LOCAL FUNCTIONS                                */
 /******************************************************************************/
-

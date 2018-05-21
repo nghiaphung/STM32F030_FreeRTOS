@@ -39,7 +39,7 @@ INCLUDE = -I./kernel/hal/CMSIS/Include \
 		-I./drivers/rtc \
 		-I./drivers/button \
 		-I./drivers/lora \
-		-I./framework \
+		-I./framework 
 
 
 SRCS = ./kernel/hal/system_stm32f0xx.c \
@@ -71,6 +71,7 @@ SRCS = ./kernel/hal/system_stm32f0xx.c \
 		./drivers/eeprom/eeprom.c \
 		./drivers/timer/timer.c \
 		./framework/events.c \
+		./framework/sysctl.c \
 		./main/main.c
 
 OBJS = $(SRCS:.c=.o)

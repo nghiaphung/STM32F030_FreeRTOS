@@ -6,13 +6,13 @@
 /**!                               INCLUDE                                    */
 /******************************************************************************/
 #include <stddef.h>
+#include <stdbool.h>
 #include "stm32f0xx.h"
 #include "stm32f0xx_gpio.h"
 #include "stm32f0xx_rcc.h"
 #include "stm32f0xx_exti.h"
 #include "stm32f0xx_misc.h"
 #include "button.h"
-#include "events.h"
 /******************************************************************************/
 /**!                            LOCAL TYPEDEF                                 */
 /******************************************************************************/
@@ -33,7 +33,7 @@
 /******************************************************************************/
 /**!                          LOCAL VARIABLES                                 */
 /******************************************************************************/
-button_callback_t button_callback = vBUTTON_EventHandler;
+button_callback_t button_callback = NULL;
 /******************************************************************************/
 /**!                    LOCAL FUNCTIONS PROTOTYPES                            */
 /******************************************************************************/
@@ -46,7 +46,7 @@ button_callback_t button_callback = vBUTTON_EventHandler;
  * @param none
  * @return none
  */
-void Button_Init (void)
+void Button_Init (button_t* button)
 {
 	GPIO_InitTypeDef GPIO_InitStruct;
 	EXTI_InitTypeDef EXTI_InitStruct;
@@ -74,6 +74,7 @@ void Button_Init (void)
     NVIC_InitStruct.NVIC_IRQChannelCmd  = ENABLE;
     NVIC_InitStruct.NVIC_IRQChannel = BUTTON_IRQ;
     NVIC_Init(&NVIC_InitStruct);
+    button_callback = button->callback;
 }
 
 /*

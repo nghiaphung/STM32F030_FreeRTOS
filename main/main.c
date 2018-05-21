@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "stm32f0xx.h"
 #include "FreeRTOS.h"
@@ -25,6 +26,7 @@
 #include "lora.h"
 #include "rtc.h"
 #include "timer.h"
+#include "events.h"
 /******************************************************************************/
 /**!                            LOCAL TYPEDEF                                 */
 /******************************************************************************/
@@ -104,9 +106,19 @@ void vApplicationStackOverflowHook( xTaskHandle pxTask, signed char *pcTaskName 
 /******************************************************************************/
 void prvHardwareSetup (void)
 {
+	serial_t serial =
+	{
+			.baudrate = 115200,
+			.callback = vSERIAL_EventHandler
+	};
+	button_t button =
+	{
+			.callback = vBUTTON_EventHandler
+	};
 	SystemInit();
 	Led_Init();
-	Serial_Init();
+	Serial_Init(&serial);
+	Button_Init(&button);
 	SysTimer_Init();
 }
 
