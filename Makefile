@@ -39,6 +39,7 @@ INCLUDE = -I./kernel/hal/CMSIS/Include \
 		-I./drivers/rtc \
 		-I./drivers/button \
 		-I./drivers/lora \
+		-I./drivers/clock \
 		-I./framework 
 
 
@@ -70,6 +71,7 @@ SRCS = ./kernel/hal/system_stm32f0xx.c \
 		./drivers/serial/serial.c \
 		./drivers/eeprom/eeprom.c \
 		./drivers/timer/timer.c \
+		./drivers/clock/clock.c \
 		./framework/events.c \
 		./framework/sysctl.c \
 		./main/main.c

@@ -53,10 +53,6 @@ void Led_Init(void)
 	RCC_GetClocksFreq(&RCC_ClocksStatus);
 	TIM_Period = (uint16_t)(RCC_ClocksStatus.PCLK_Frequency/LED_FREQ)-1;
 
-	/* Enable clock */
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE);
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
-
 	/* Initialize GPIO */
 	GPIO_InitStruct.GPIO_Pin   = LED_GPIO_PIN;
 	GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_AF;

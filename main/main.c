@@ -9,14 +9,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
-
+#include <stdint.h>
 #include "stm32f0xx.h"
 #include "FreeRTOS.h"
 #include "portmacro.h"
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
-
+#include "clock.h"
 #include "led.h"
 #include "serial.h"
 #include "meter.h"
@@ -27,6 +27,7 @@
 #include "rtc.h"
 #include "timer.h"
 #include "events.h"
+#include "sysctl.h"
 /******************************************************************************/
 /**!                            LOCAL TYPEDEF                                 */
 /******************************************************************************/
@@ -42,12 +43,10 @@
 /******************************************************************************/
 /**!                          LOCAL VARIABLES                                 */
 /******************************************************************************/
-xTaskHandle xTask2Handle;
+
 /******************************************************************************/
 /**!                    LOCAL FUNCTIONS PROTOTYPES                            */
 /******************************************************************************/
-void vTask1(void* pvParam);
-void vTask2(void* pvParam);
 void prvHardwareSetup(void);
 /******************************************************************************/
 /**!                        EXPORTED FUNCTIONS                                */
@@ -57,22 +56,11 @@ int main(int argc, char* argv[])
 {
     /* To avoid compiler error/warning */
     int temp = argc + (uint32_t)argv; temp++;
-
     prvHardwareSetup();
-	portBASE_TYPE task_result;
-	task_result = xTaskCreate(vTask2, "Task 2", 240, NULL, 2, &xTask2Handle);
-	if (task_result != pdPASS)
-	{
-		Serial_Send("Failed 2", 8);
-	}
-	task_result = xTaskCreate(vTask1, "Task 1", 240, NULL, 1, NULL);
-	if (task_result != pdPASS)
-	{
-		Serial_Send("Failed 1", 8);
-	}
-	vTaskStartScheduler();
+
 
 	while(1);
+
 	return 1;
 }
 
@@ -109,40 +97,20 @@ void prvHardwareSetup (void)
 	serial_t serial =
 	{
 			.baudrate = 115200,
-			.callback = vSERIAL_EventHandler
+			.callback = NULL
 	};
 	button_t button =
 	{
-			.callback = vBUTTON_EventHandler
+			.callback = NULL
 	};
 	SystemInit();
+	Clock_Enable();
 	Led_Init();
 	Serial_Init(&serial);
 	Button_Init(&button);
+	Eeprom_Init();
 	SysTimer_Init();
+	//Meter_Init();
 }
 
-void vTask1(void* pvParam)
-{
-	int uxPriority;
-	uxPriority = uxTaskPriorityGet(NULL);
-	for(;;)
-	{
-		printf("%s : Free heap size %d bytes\r\n", __func__, xPortGetFreeHeapSize());
-		printf("raise task 2 priority");
-		vTaskPrioritySet(xTask2Handle, (uxPriority + 1));
-	}
-}
-
-void vTask2(void* pvParam)
-{
-	int uxPriority;
-	uxPriority = uxTaskPriorityGet(NULL);
-	for(;;)
-	{
-		printf("Task 2 is running\n");
-		printf("lower task 2 priority");
-		vTaskPrioritySet(NULL, (uxPriority - 2));
-	}
-}
 

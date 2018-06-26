@@ -56,9 +56,9 @@ uint8_t CRC_u8Checksum;
 void _crc8Calc(uint8_t Data);
 uint8_t _calcCRC8(uint8_t *pBuf);
 uint8_t _spi_Transfer(uint8_t pData);
-uint32_t _meter_ReadRegister(uint8_t addr);
 void _meter_Enable (void);
 void _meter_Disable (void);
+void delay(void);
 /******************************************************************************/
 /**!                        EXPORTED FUNCTIONS                                */
 /******************************************************************************/
@@ -69,10 +69,6 @@ void Meter_Init (void)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
     SPI_InitTypeDef  SPI_InitStruct;
-	/* Enable GPIOA, GPIOB, SPI1 clock */
-    //>! NOTE: GPIOA was enable in serial.c
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
 
     /* Initialize PA4  CS */
     GPIO_InitStruct.GPIO_Pin   = METER_SPI_CS_PIN;
@@ -129,26 +125,11 @@ void Meter_Init (void)
 	SPI_Init(METER_HW, &SPI_InitStruct);
 	SPI_Cmd(METER_HW, ENABLE);
 
-}
-
-uint32_t Meter_ReadVol(void)
-{
+	GPIO_SetBits(METER_SYN_PORT, METER_SYN_PIN);
 
 }
 
-uint32_t Meter_ReadCur(void)
-{
-
-}
-
-uint32_t Meter_ReadPower(void)
-{
-
-}
-/******************************************************************************/
-/**!                           LOCAL FUNCTIONS                                */
-/******************************************************************************/
-uint32_t _meter_ReadRegister(uint8_t addr)
+uint32_t Meter_ReadRegister(uint8_t addr)
 {
 	uint8_t send_buff[5];
 	uint8_t recv_buff[5];
@@ -159,13 +140,21 @@ uint32_t _meter_ReadRegister(uint8_t addr)
 	send_buff[3] = 0x00;
 	send_buff[4] = _calcCRC8(send_buff);
 	_meter_Enable();
+	delay();
 	for (i = 0; i < METER_FRAME_LEN; i++)
 	{
 		recv_buff[i] = _spi_Transfer(send_buff[i]);
 	}
 	_meter_Disable();
-
+	delay();
+	delay();
+	send_buff[0] = 0xFF;
+	send_buff[1] = 0xFF;
+	send_buff[2] = 0xAA;
+	send_buff[3] = 0x55;
+	send_buff[4] = _calcCRC8(send_buff);
 	_meter_Enable();
+	delay();
 	for (i = 0; i < METER_FRAME_LEN; i++)
 	{
 		recv_buff[i] = _spi_Transfer(send_buff[i]);
@@ -176,14 +165,18 @@ uint32_t _meter_ReadRegister(uint8_t addr)
 
 }
 
+/******************************************************************************/
+/**!                           LOCAL FUNCTIONS                                */
+/******************************************************************************/
+
 void _meter_Enable(void)
 {
-	GPIO_ResetBits(METER_EN_PORT, METER_EN_PIN);
+	GPIO_ResetBits(METER_SPI_CS_PORT, METER_SPI_CS_PIN);
 }
 
 void _meter_Disable(void)
 {
-	GPIO_SetBits(METER_EN_PORT, METER_EN_PIN);
+	GPIO_SetBits(METER_SPI_CS_PORT, METER_SPI_CS_PIN);
 }
 
 
@@ -224,6 +217,13 @@ uint8_t _spi_Transfer(uint8_t pData)
 	// Return received data from SPI data register
 	return METER_HW->DR;
 
+}
+
+void delay(void)
+{
+	uint16_t count = 500;
+	int i = 0;
+	for (i = 0; i < count; i++);
 }
 /******************************************************************************/
 /**!                                 END                                      */

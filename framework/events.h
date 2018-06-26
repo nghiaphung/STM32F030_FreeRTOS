@@ -22,8 +22,8 @@ typedef struct{
  * @brief System event ID
  */
 typedef enum{
-    SYS_EVENT_BUTTON = 0x00,
-    SYS_EVENT_IR_CMD = 0x01
+    EVENT_BUTTON = 0x00,
+    EVENT_METER = 0x01
 }event_id_t;
 
 void vBUTTON_EventHandler(button_event_t event);

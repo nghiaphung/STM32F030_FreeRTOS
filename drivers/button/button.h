@@ -8,8 +8,8 @@
 
 typedef enum
 {
-	BUTTON_INACTIVE = 0,
-	BUTTON_ACTIVE =1
+	BUTTON_INACTIVE = 1,
+	BUTTON_ACTIVE =0
 }button_status_t;
 
 /**

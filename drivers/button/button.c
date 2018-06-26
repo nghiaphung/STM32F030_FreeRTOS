@@ -7,6 +7,7 @@
 /******************************************************************************/
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include "stm32f0xx.h"
 #include "stm32f0xx_gpio.h"
 #include "stm32f0xx_rcc.h"
@@ -94,8 +95,10 @@ button_status_t Button_Get(void)
 /******************************************************************************/
 void EXTI0_1_IRQHandler(void)
 {
+	printf("Button pressed");
 	if (SET == EXTI_GetITStatus(BUTTON_EXTI_LINE))
 	{
+
 		if(SET == GPIO_ReadInputDataBit(BUTTON_GPIO_PORT, BUTTON_GPIO_PIN))
 			button_callback(BUTTON_RISING_EDGE);
 		else

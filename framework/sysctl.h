@@ -13,4 +13,7 @@ typedef struct {
     uint8_t param[4];
 }sys_events_t;
 
+void vSERIAL_CmdService(void *pvParam);
+void vIO_QueryService(void *pvParam);
+
 #endif /* SYSCTL_H */

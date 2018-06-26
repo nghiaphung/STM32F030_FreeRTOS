@@ -1,19 +1,14 @@
 /*
- * @filename: sysctl.c
- * @date: 16/5/2018
+ * @filename: eeprom.c
+ * @date: 13/5/2018
  */
 /******************************************************************************/
 /**!                               INCLUDE                                    */
 /******************************************************************************/
-#include <stddef.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include "FreeRTOS.h"
-#include "queue.h"
-#include "task.h"
-#include "events.h"
-#include "sysctl.h"
+#include "stm32f0xx.h"
+#include "stm32f0xx_gpio.h"
+#include "stm32f0xx_i2c.h"
+#include "clock.h"
 /******************************************************************************/
 /**!                            LOCAL TYPEDEF                                 */
 /******************************************************************************/
@@ -37,7 +32,14 @@
 /******************************************************************************/
 /**!                        EXPORTED FUNCTIONS                                */
 /******************************************************************************/
+void Clock_Enable (void)
+{
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE);
 
-/******************************************************************************/
-/**!                           LOCAL FUNCTIONS                                */
-/******************************************************************************/
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
+
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+}

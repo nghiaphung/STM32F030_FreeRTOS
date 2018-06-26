@@ -61,11 +61,6 @@ void Serial_Init (serial_t* serial)
 {
 	USART_InitTypeDef USART_InitStruct;
 	GPIO_InitTypeDef  GPIO_InitStruct;
-	NVIC_InitTypeDef  NVIC_InitStruct;
-
-	/* Enable GPIOA, USART1 clock */
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 
 	GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_AF;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
@@ -89,18 +84,18 @@ void Serial_Init (serial_t* serial)
 	USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 	USART_Init(SERIAL_HW, &USART_InitStruct);
 
-	USART_ITConfig(SERIAL_HW, USART_IT_RXNE, ENABLE);
-	USART_ITConfig(SERIAL_HW, USART_IT_ERR, ENABLE);
-	USART_ITConfig(SERIAL_HW, USART_IT_PE, ENABLE);
+//	USART_ITConfig(SERIAL_HW, USART_IT_RXNE, ENABLE);
+//	USART_ITConfig(SERIAL_HW, USART_IT_ERR, ENABLE);
+//	USART_ITConfig(SERIAL_HW, USART_IT_PE, ENABLE);
 
 	USART_Cmd(SERIAL_HW, ENABLE);
 
 	/* Configure interrupt */
-	NVIC_InitStruct.NVIC_IRQChannel = USART1_IRQn;
-	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_InitStruct.NVIC_IRQChannelPriority = 0;
-	NVIC_Init(&NVIC_InitStruct);
-	serial_callback = serial->callback;
+//	NVIC_InitStruct.NVIC_IRQChannel = USART1_IRQn;
+//	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+//	NVIC_InitStruct.NVIC_IRQChannelPriority = 0;
+//	NVIC_Init(&NVIC_InitStruct);
+//	serial_callback = serial->callback;
 }
 
 
